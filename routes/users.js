@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-var { User } = require("../../model/users");
+var { User } = require("../model/User");
 var bcrypt = require("bcryptjs");
 var _ = require("lodash");
 var jwt = require("jsonwebtoken");
