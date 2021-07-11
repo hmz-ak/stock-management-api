@@ -1,19 +1,18 @@
 var express = require("express");
 var router = express.Router();
 var { Sale } = require("../model/saleReport");
-var validateSale = require("../middleware/validateSale");
+var { Stock } = require("../model/Stock");
 
 router.get("/", async (req, res) => {});
 
-router.post("/", validateSale, async (req, res) => {
-  let sale = new Sale();
-  sale.name = req.body.name;
-  sale.quantity = req.body.quantity;
-  sale.itemCode = req.body.itemCode;
-  if (sale.discount) {
-    sale.discount = req.body.discount;
+router.post("/", async (req, res) => {
+  let sale = new Sale({ customerName: req.body.name, data: req.body.data });
+
+  for (let i = 0; i < sale.data.length; i++) {
+    let dat = await Stock.findById(sale.data[i].id);
+    dat.stockQuantity = dat.stockQuantity - sale.data[i].quantity;
+    await dat.save();
   }
-  sale.amount = req.body.amount;
   await sale.save();
   res.send(sale);
 });

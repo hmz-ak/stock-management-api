@@ -4,6 +4,7 @@ var Joi = require("joi");
 var stockSchema = mongoose.Schema(
   {
     name: String,
+    rackNumber: Number,
     costPrice: Number,
     salePrice: Number,
     category: String,
@@ -22,6 +23,7 @@ function validateStock(data) {
     stockQuantity: Joi.number().required(),
     itemCode: Joi.number().required(),
     category: Joi.string().required(),
+    rackNumber: Joi.number(),
   });
   return schema.validate(data);
 }

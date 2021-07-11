@@ -21,7 +21,7 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(401).send("This email is not registered");
+  if (!user) return res.status(400).send("This email is not registered");
   const isValid = await bcrypt.compare(req.body.password, user.password);
   if (!isValid) return res.status(401).send("Password incorrect");
   var token = jwt.sign(
