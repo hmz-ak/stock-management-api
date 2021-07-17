@@ -5,7 +5,7 @@ var { Customer } = require("../model/Customer");
 var { Stock } = require("../model/Stock");
 
 router.get("/", async (req, res) => {
-  let sales = await Sale.find().sort({ date: "desc" });
+  let sales = await Customer.find().sort({ date: "desc" });
   // console.log(sales);
   res.send(sales);
 });
@@ -23,12 +23,25 @@ router.post("/profit", async (req, res) => {
   res.send(sales);
 });
 router.get("/:id", async (req, res) => {
-  let sales = await Sale.findById(req.params.id);
+  let sales = await Customer.findById(req.params.id);
   // console.log(sales);
   res.send(sales);
 });
 
+router.put("/:id", async (req, res) => {
+  console.log(req.body);
+
+  let sales = await Customer.findById(req.params.id);
+  sales.remaining = sales.remaining - req.body.remaining;
+  sales.paid = sales.paid + req.body.remaining;
+  await sales.save();
+  console.log(sales);
+  res.send(sales);
+});
+
 router.post("/", async (req, res) => {
+  let lastDoc = await Sale.find({}).sort({ _id: -1 }).limit(1);
+
   let sale = new Customer({
     customerName: req.body.customerName ? req.body.customerName : "unknown",
     costPriceTotal: req.body.costPriceTotal ? req.body.costPriceTotal : 0,
@@ -37,8 +50,12 @@ router.post("/", async (req, res) => {
     remaining: req.body.customerRemaining ? req.body.customerRemaining : 0,
     address: req.body.customerAddress ? req.body.customerAddress : "null",
     contact: req.body.customerContact ? req.body.customerContact : "null",
+    invoice_num: lastDoc[0].temp_invoice_num + 1,
     data: req.body.receipt,
   });
+  lastDoc[0].temp_invoice_num = lastDoc[0].temp_invoice_num + 1;
+
+  await lastDoc[0].save();
 
   for (let i = 0; i < sale.data.length; i++) {
     let dat = await Stock.findById(sale.data[i].id);
@@ -51,6 +68,11 @@ router.post("/", async (req, res) => {
 
 router.delete("/del", async (req, res) => {
   await Sale.remove({});
+  res.send("done");
+});
+
+router.delete("/del", async (req, res) => {
+  await Customer.remove({});
   res.send("done");
 });
 

@@ -45,4 +45,9 @@ router.delete("/:id", async (req, res) => {
   await stock.remove();
   res.send(stock);
 });
+
+router.delete("/del", async (req, res) => {
+  await Stock.remove({});
+  res.send("done");
+});
 module.exports = router;

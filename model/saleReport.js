@@ -12,6 +12,8 @@ var saleSchema = mongoose.Schema({
     type: String,
     default: "unknown",
   },
+  invoice_num: Number,
+  temp_invoice_num: Number,
   costPriceTotal: { type: Number, default: 0 },
   salePriceTotal: { type: Number, default: 0 },
   data: [],

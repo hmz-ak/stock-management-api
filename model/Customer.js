@@ -16,6 +16,7 @@ var customerSchema = mongoose.Schema({
   contact: String,
   paid: Number,
   remaining: Number,
+  invoice_num: Number,
   costPriceTotal: { type: Number, default: 0 },
   salePriceTotal: { type: Number, default: 0 },
   data: [],
