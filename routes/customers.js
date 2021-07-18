@@ -22,20 +22,61 @@ router.post("/profit", async (req, res) => {
   // console.log(sales);
   res.send(sales);
 });
+
+router.post("/getCustomerByInvoice", async (req, res) => {
+  console.log(req.body);
+  if (req.body.value != "") {
+    let number = parseInt(req.body.value);
+    let customer = await Customer.find({ invoice_num: number });
+    res.send(customer);
+  } else {
+    let customer = [];
+    res.send([]);
+  }
+});
 router.get("/:id", async (req, res) => {
   let sales = await Customer.findById(req.params.id);
   // console.log(sales);
   res.send(sales);
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/invoice/:id", async (req, res) => {
   console.log(req.body);
 
   let sales = await Customer.findById(req.params.id);
+  // console.log(sales.data);
+
+  for (let i = 0; i < req.body.receipt.length; i++) {
+    sales.data.push(req.body.receipt[i]);
+    let dat = await Stock.findById(req.body.receipt[i].id);
+    dat.stockQuantity = dat.stockQuantity - req.body.receipt[i].quantity;
+    await dat.save();
+  }
+  sales.salePriceTotal = sales.salePriceTotal + req.body.salePriceTotal;
+  sales.costPriceTotal = sales.costPriceTotal + req.body.costPriceTotal;
+  sales.remaining = sales.remaining + req.body.customerRemaining;
+  sales.save();
+
+  res.send(sales);
+});
+
+router.put("/:id", async (req, res) => {
+  console.log(req.body);
+  // let final = req.body.totalAmount - req.body.remaining;
+
+  let sales = await Customer.findById(req.params.id);
+  console.log(sales);
+
+  sales.data.push({
+    name: "Payment Received",
+    credit: req.body.remaining,
+    total: req.body.remaining,
+    date: new Date().getTime() / 1000,
+  });
   sales.remaining = sales.remaining - req.body.remaining;
   sales.paid = sales.paid + req.body.remaining;
   await sales.save();
-  console.log(sales);
+  // console.log(sales);
   res.send(sales);
 });
 
@@ -67,13 +108,8 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/del", async (req, res) => {
-  await Sale.remove({});
-  res.send("done");
-});
-
-router.delete("/del", async (req, res) => {
   await Customer.remove({});
-  res.send("done");
+  res.send("done deleting");
 });
 
 module.exports = router;
