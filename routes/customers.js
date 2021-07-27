@@ -27,7 +27,7 @@ router.post("/getCustomerByInvoice", async (req, res) => {
   console.log(req.body);
   if (req.body.value != "") {
     let number = parseInt(req.body.value);
-    let customer = await Customer.find({ invoice_num: number });
+    let customer = await Customer.find({ customerName: req.body.value });
     res.send(customer);
   } else {
     let customer = [];
@@ -41,10 +41,10 @@ router.get("/:id", async (req, res) => {
 });
 
 router.put("/invoice/:id", async (req, res) => {
-  console.log(req.body);
-
+  // console.log(req.body);
+  let lastDoc = await Sale.find({}).sort({ _id: -1 }).limit(1);
   let sales = await Customer.findById(req.params.id);
-  // console.log(sales.data);
+  console.log(sales);
 
   for (let i = 0; i < req.body.receipt.length; i++) {
     sales.data.push(req.body.receipt[i]);
@@ -52,6 +52,11 @@ router.put("/invoice/:id", async (req, res) => {
     dat.stockQuantity = dat.stockQuantity - req.body.receipt[i].quantity;
     await dat.save();
   }
+  // sales.data.push(lastDoc[0].temp_invoice_num + 1);
+  lastDoc[0].temp_invoice_num = lastDoc[0].temp_invoice_num + 1;
+
+  await lastDoc[0].save();
+
   sales.salePriceTotal = sales.salePriceTotal + req.body.salePriceTotal;
   sales.costPriceTotal = sales.costPriceTotal + req.body.costPriceTotal;
   sales.remaining = sales.remaining + req.body.customerRemaining;

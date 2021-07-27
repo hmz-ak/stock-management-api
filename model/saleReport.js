@@ -10,7 +10,7 @@ function getDate() {
 var saleSchema = mongoose.Schema({
   customerName: {
     type: String,
-    default: "unknown",
+    default: "Counter Sale",
   },
   invoice_num: Number,
   temp_invoice_num: Number,
