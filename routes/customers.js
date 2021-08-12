@@ -73,7 +73,7 @@ router.put("/:id", async (req, res) => {
   console.log(sales);
 
   sales.data.push({
-    name: "Payment Received",
+    name: req.body.amount_desc ? req.body.amount_desc : "Payment Received",
     credit: req.body.remaining,
     total: req.body.remaining,
     date: new Date().getTime() / 1000,
